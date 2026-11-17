@@ -1,0 +1,3014 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SmartCity360 · Operations Console</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ================== DESIGN TOKENS (LIGHT MODE ENTERPRISE SAAS) ================== */
+:root {
+    /* Subtle gray and white surfaces (Swiss Grid Minimalist) */
+    --bg-0: #F8FAFC;          /* App canvas background */
+    --bg-1: #FFFFFF;          /* Sidebar / Topbar surface */
+    --bg-2: #FFFFFF;          /* Card surface */
+    --bg-3: #F8FAFC;          /* Hover surface / elevated */
+    --bg-4: #F1F5F9;          /* Input background / muted tags */
+    --bg-card: #FFFFFF;
+
+    /* Hairline high-contrast borders */
+    --border-subtle: #F1F5F9;
+    --border:        #E2E8F0; /* Clean Slate-200 border */
+    --border-strong: #CBD5E1; /* Input and divider border */
+
+    /* High-contrast typography */
+    --text-primary:   #0F172A; /* Deep Slate-900 / maximum legibility */
+    --text-secondary: #334155; /* Slate-700 */
+    --text-tertiary:  #64748B; /* Slate-500 */
+    --text-disabled:  #94A3B8; /* Slate-400 */
+
+    /* Enterprise Blue Accent & Pastels (Flat, zero neon) */
+    --accent:        #2563EB; /* Blue-600 */
+    --accent-hover:  #1D4ED8; /* Blue-700 */
+    --accent-soft:   #EFF6FF; /* Blue-50 */
+    --accent-border: #BFDBFE; /* Blue-200 */
+    --accent-text:   #1E40AF; /* Blue-800 */
+    --accent-glow:   rgba(37, 99, 235, 0.12);
+
+    /* Status Colors (Solid & Soft Pastels) */
+    --success:        #059669; /* Emerald-600 */
+    --success-soft:   #ECFDF5; /* Emerald-50 */
+    --success-border: #A7F3D0; /* Emerald-200 */
+    --success-text:   #065F46;
+
+    --warning:        #D97706; /* Amber-600 */
+    --warning-soft:   #FFFBEB; /* Amber-50 */
+    --warning-border: #FDE68A; /* Amber-200 */
+    --warning-text:   #92400E;
+
+    --danger:         #DC2626; /* Red-600 */
+    --danger-soft:    #FEF2F2; /* Red-50 */
+    --danger-border:  #FECACA; /* Red-200 */
+    --danger-text:    #991B1B;
+
+    --info:           #4F46E5; /* Indigo-600 */
+    --info-soft:      #EEF2FF; /* Indigo-50 */
+    --info-border:    #C7D2FE; /* Indigo-200 */
+    --info-text:      #3730A3;
+
+    /* Typography */
+    --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-body:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono:    'JetBrains Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+
+    /* Precision Radii */
+    --r-sm: 6px;
+    --r:    8px;
+    --r-lg: 12px;
+
+    /* Flat SaaS Drop Shadows */
+    --shadow-xs: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(16, 24, 40, 0.06), 0 1px 2px -1px rgba(16, 24, 40, 0.04);
+    --shadow-md: 0 4px 6px -1px rgba(16, 24, 40, 0.06), 0 2px 4px -2px rgba(16, 24, 40, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(16, 24, 40, 0.06), 0 4px 6px -4px rgba(16, 24, 40, 0.03);
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg-0);
+    color: var(--text-primary);
+    font-size: 13.5px;
+    line-height: 1.5;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    letter-spacing: -0.01em;
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, textarea, select { font-family: inherit; }
+svg { display: block; }
+
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* ================== APP SHELL ================== */
+.app { display: flex; height: 100vh; }
+
+/* ================== SIDEBAR ================== */
+.sidebar {
+    width: 232px;
+    background: var(--bg-1);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 20;
+}
+
+.sidebar-brand {
+    height: 58px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 18px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.brand-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    flex-shrink: 0;
+    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+}
+.brand-mark svg { width: 16px; height: 16px; stroke-width: 2.2; }
+.brand-text {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: -0.025em;
+    color: var(--text-primary);
+}
+.brand-text span { color: var(--accent); font-weight: 700; }
+
+.sidebar-nav {
+    flex: 1;
+    padding: 14px 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.nav-section {
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-tertiary);
+    padding: 10px 10px 4px;
+    margin-top: 4px;
+}
+.nav-section:first-child { margin-top: 0; }
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: var(--r-sm);
+    color: var(--text-secondary);
+    font-size: 0.84rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+    position: relative;
+    border: 1px solid transparent;
+}
+.nav-item:hover {
+    background: var(--bg-3);
+    color: var(--text-primary);
+}
+.nav-item.active {
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    font-weight: 600;
+    border-color: var(--accent-border);
+}
+.nav-item svg {
+    width: 17px;
+    height: 17px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    flex-shrink: 0;
+}
+.nav-item.active svg {
+    stroke: var(--accent);
+}
+
+.nav-count {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: var(--bg-4);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+.nav-count.alert {
+    background: var(--danger-soft);
+    color: var(--danger);
+    border-color: var(--danger-border);
+}
+
+.sidebar-footer {
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+    background: var(--bg-1);
+}
+.user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #E2E8F0;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+    border: 1px solid var(--border);
+}
+.user-meta { flex: 1; min-width: 0; }
+.user-name {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.user-role {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ================== MAIN ================== */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--bg-0);
+    overflow: hidden;
+}
+
+/* ================== TOPBAR ================== */
+.topbar {
+    height: 58px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0;
+    z-index: 10;
+}
+.topbar-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+.breadcrumb {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.breadcrumb span { color: var(--text-disabled); }
+.topbar-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.08rem;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+.topbar-subtitle {
+    font-size: 0.76rem;
+    font-weight: 400;
+    color: var(--text-tertiary);
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: var(--success-soft);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+}
+
+.topbar-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+}
+
+.clock {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--text-tertiary);
+    padding: 4px 8px;
+    border-radius: var(--r-sm);
+    background: var(--bg-4);
+    border: 1px solid var(--border);
+}
+
+/* ================== CONTENT ================== */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.view {
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+    animation: fadeIn 0.2s ease;
+}
+.view.active { display: flex; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.page-intro {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 2px;
+}
+.page-intro h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--text-primary);
+}
+.page-intro p {
+    font-size: 0.82rem;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+    max-width: 680px;
+}
+
+/* ================== CARDS & SWISS GRID ================== */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 18px;
+}
+
+.col-3  { grid-column: span 3; }
+.col-4  { grid-column: span 4; }
+.col-5  { grid-column: span 5; }
+.col-6  { grid-column: span 6; }
+.col-7  { grid-column: span 7; }
+.col-8  { grid-column: span 8; }
+.col-12 { grid-column: span 12; }
+
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: var(--shadow-card);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.card:hover {
+    border-color: #CBD5E1;
+}
+
+.card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    gap: 10px;
+}
+.card-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: -0.015em;
+}
+.card-title svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--accent);
+    stroke-width: 1.8;
+}
+.card-meta {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    background: var(--bg-4);
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+}
+
+/* ================== STAT DISPLAY (MINI KPI CARDS) ================== */
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+.stat-label svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--text-tertiary);
+}
+.stat-value {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    line-height: 1.15;
+    margin-bottom: 8px;
+}
+.stat-value .unit {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    margin-left: 3px;
+}
+.stat-trend {
+    font-size: 0.74rem;
+    color: var(--text-tertiary);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+}
+.stat-trend.up {
+    color: var(--success);
+}
+.stat-trend.up .arrow {
+    color: var(--success);
+}
+.stat-divider {
+    height: 1px;
+    background: var(--border-subtle);
+    margin: 12px 0;
+}
+
+/* ================== DATA ROWS ================== */
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 0.8rem;
+}
+.data-row:last-child { border-bottom: none; }
+.data-row .label {
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+.data-row .value {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ================== STATUS DOTS (FLAT, CLEAN) ================== */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+    background: var(--text-disabled);
+}
+.status-dot.success {
+    background: var(--success);
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
+}
+.status-dot.warning {
+    background: var(--warning);
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2);
+}
+.status-dot.danger {
+    background: var(--danger);
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+}
+.status-dot.pulse {
+    animation: statusPulse 2s infinite ease-in-out;
+}
+@keyframes statusPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.8; }
+}
+
+/* ================== BADGES (PASTEL FIGMA STYLE) ================== */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 1px solid transparent;
+}
+.badge.success {
+    background: var(--success-soft);
+    color: var(--success-text);
+    border-color: var(--success-border);
+}
+.badge.warning {
+    background: var(--warning-soft);
+    color: var(--warning-text);
+    border-color: var(--warning-border);
+}
+.badge.danger {
+    background: var(--danger-soft);
+    color: var(--danger-text);
+    border-color: var(--danger-border);
+}
+.badge.info {
+    background: var(--info-soft);
+    color: var(--info-text);
+    border-color: var(--info-border);
+}
+
+/* ================== ACTIVITY FEED ================== */
+.activity {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--r-sm);
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    transition: background 0.15s ease;
+}
+.activity-item:hover {
+    background: #F1F5F9;
+}
+.activity-marker {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background: var(--accent-soft);
+    color: var(--accent-text);
+    border: 1px solid var(--accent-border);
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+.activity-body { flex: 1; min-width: 0; }
+.activity-text {
+    font-size: 0.78rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+.activity-text strong {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.activity-time {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+    margin-left: 8px;
+    margin-top: 2px;
+}
+
+/* ================== COMPLAINTS & REALISTIC DATA TABLES ================== */
+.complaints {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 440px;
+    overflow-y: auto;
+}
+.complaint-item {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.complaint-item:hover {
+    background: var(--bg-0);
+    border-color: #CBD5E1;
+}
+.complaint-item.selected {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+}
+.complaint-item.resolved {
+    opacity: 0.65;
+}
+.complaint-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--text-tertiary);
+}
+.complaint-title {
+    font-weight: 600;
+    font-size: 0.84rem;
+    color: var(--text-primary);
+}
+.complaint-desc {
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+.complaint-sev {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.68rem;
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+.complaint-sev.low { background: var(--success-soft); color: var(--success-text); border: 1px solid var(--success-border); }
+.complaint-sev.med { background: var(--warning-soft); color: var(--warning-text); border: 1px solid var(--warning-border); }
+.complaint-sev.high { background: var(--danger-soft); color: var(--danger-text); border: 1px solid var(--danger-border); }
+.complaint-sev.crit { background: #7F1D1D; color: #FEE2E2; }
+
+/* Clean Data Table */
+table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+table.data-table th {
+    background: var(--bg-0);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+table.data-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+}
+table.data-table tr:hover td {
+    background: var(--bg-0);
+}
+
+/* ================== CHAIN OF RESPONSIBILITY ================== */
+.chain {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.chain-node {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: var(--r-sm);
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+}
+.chain-node.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+}
+.chain-node.handled {
+    background: var(--success-soft);
+    border-color: var(--success-border);
+}
+.chain-node svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--text-tertiary);
+    flex-shrink: 0;
+}
+.chain-node.active svg { stroke: var(--accent); }
+.chain-node.handled svg { stroke: var(--success); }
+.chain-name {
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: var(--text-primary);
+}
+.chain-range {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    background: #FFFFFF;
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+}
+
+/* ================== COMPOSITE TREE (CITY ZONES) ================== */
+.tree-container {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 16px 18px;
+    max-height: 480px;
+    overflow-y: auto;
+}
+.tree, .tree ul {
+    list-style: none;
+    padding-left: 18px;
+    margin: 0;
+    position: relative;
+}
+.tree ul::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 8px;
+    left: 7px;
+    width: 1px;
+    background: var(--border);
+}
+.tree li {
+    position: relative;
+    margin: 4px 0;
+}
+.tree-node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: var(--r-sm);
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+.tree-node:hover {
+    background: var(--bg-0);
+    border-color: #CBD5E1;
+}
+.tree-node.selected {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+}
+.tree-node.executing {
+    animation: nodePulse 0.6s ease;
+}
+@keyframes nodePulse {
+    0%, 100% { border-color: var(--accent); }
+    50% { background: #DBEAFE; }
+}
+.tree-name {
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+}
+.tree-node.selected .tree-name {
+    font-weight: 600;
+    color: var(--accent-text);
+}
+.tree-count {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-tertiary);
+    margin-left: 4px;
+}
+
+/* ================== COMMANDS & TRACE ================== */
+.cmd-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.cmd-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: var(--r-sm);
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: #FFFFFF;
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    transition: all 0.15s ease;
+    box-shadow: var(--shadow-xs);
+}
+.cmd-btn:hover:not(:disabled) {
+    background: var(--bg-0);
+    border-color: var(--text-primary);
+}
+.cmd-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.trace {
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 12px 14px;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    max-height: 240px;
+    overflow-y: auto;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+.trace-line { margin: 2px 0; }
+.trace-line.head { font-weight: 600; color: var(--text-primary); }
+.trace-line.summary { color: var(--accent-text); font-weight: 600; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border); }
+
+/* ================== FORMS & INPUTS ================== */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+.form-label {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.form-input, .form-textarea, select.form-input {
+    background: #FFFFFF;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-sm);
+    padding: 8px 12px;
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    width: 100%;
+}
+.form-input:focus, .form-textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.45;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: var(--r-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    box-shadow: var(--shadow-xs);
+}
+.btn-primary {
+    background: var(--accent);
+    color: #FFFFFF;
+}
+.btn-primary:hover {
+    background: var(--accent-hover);
+}
+.btn-ghost {
+    background: #FFFFFF;
+    border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+}
+.btn-ghost:hover {
+    background: var(--bg-0);
+    color: var(--text-primary);
+}
+
+/* ================== CHIPS (DECORATOR FILTERS) ================== */
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.74rem;
+    font-weight: 600;
+    background: #FFFFFF;
+    border: 1px solid var(--border-strong);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.chip:hover {
+    background: var(--bg-0);
+    color: var(--text-primary);
+}
+.chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #FFFFFF;
+}
+
+/* ================== PIPELINE (FLOW STEPS) ================== */
+.flow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.flow-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: var(--r-sm);
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+}
+.flow-step.active {
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
+}
+.flow-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-tertiary);
+}
+.flow-step.active .flow-num {
+    background: var(--accent);
+    color: #FFFFFF;
+    border-color: var(--accent);
+}
+
+.result-box {
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 12px 14px;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--text-primary);
+    word-break: break-all;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+/* ================== MEMORY (FLYWEIGHT STREETLIGHTS) ================== */
+.mem-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 16px;
+}
+.mem-card {
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.mem-card.with {
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
+}
+.mem-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+}
+.mem-value {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.mem-sub {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+}
+.mem-bar {
+    height: 6px;
+    background: #E2E8F0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+.mem-fill {
+    height: 100%;
+    background: var(--text-tertiary);
+    border-radius: 3px;
+    transition: width 0.2s ease;
+}
+.mem-card.with .mem-fill {
+    background: var(--accent);
+}
+
+.savings {
+    background: var(--success-soft);
+    border: 1px solid var(--success-border);
+    border-radius: var(--r-sm);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.savings-label {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--success-text);
+}
+.savings-value {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--success);
+}
+
+/* ================== AST (INTERPRETER PATTERN) ================== */
+/* ================== AST GRAPHICAL TREE DIAGRAM ================== */
+.ast-container {
+    padding: 0;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    overflow: auto;
+    min-height: 280px;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+.ast-empty {
+    text-align: center;
+    color: var(--text-tertiary);
+    font-style: italic;
+    padding: 60px 20px;
+    font-size: 0.78rem;
+    font-family: var(--font-mono);
+}
+
+.ast-tree {
+    display: flex;
+    justify-content: center;
+    padding: 12px 10px;
+    min-width: max-content;
+}
+.ast-tree ul {
+    display: flex;
+    justify-content: center;
+    padding-top: 22px;
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+}
+.ast-tree > ul {
+    padding-top: 0;
+}
+.ast-tree li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 22px 10px 0;
+    position: relative;
+    list-style: none;
+    margin: 0;
+}
+/* Tree branch connector lines */
+.ast-tree li::before, .ast-tree li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 50%;
+    width: 50%;
+    height: 22px;
+    border-top: 1.5px solid var(--border-strong);
+}
+.ast-tree li::after {
+    right: auto;
+    left: 50%;
+    border-left: 1.5px solid var(--border-strong);
+}
+.ast-tree li:only-child::before, .ast-tree li:only-child::after {
+    display: none;
+}
+.ast-tree li:only-child {
+    padding-top: 0;
+}
+.ast-tree li:first-child::before, .ast-tree li:last-child::after {
+    border: 0 none;
+}
+.ast-tree li:first-child::after {
+    border-radius: 6px 0 0 0;
+}
+.ast-tree li:last-child::before {
+    border-right: 1.5px solid var(--border-strong);
+    border-radius: 0 6px 0 0;
+}
+.ast-tree ul ul::before, .ast-tree li > ul::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    border-left: 1.5px solid var(--border-strong);
+    width: 0;
+    height: 22px;
+}
+
+/* Tree Nodes Pill Styling */
+.ast-node {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 14px;
+    background: #FFFFFF;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--r-sm);
+    white-space: nowrap;
+    position: relative;
+    z-index: 1;
+    min-width: 80px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.ast-node:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.1);
+}
+.ast-node .lbl {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.ast-node .cls {
+    font-family: var(--font-mono);
+    font-size: 0.54rem;
+    color: var(--text-tertiary);
+    border-top: 1px dashed var(--border);
+    padding-top: 3px;
+    margin-top: 4px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* Node types styling matching Swiss Light Theme */
+.ast-node.logical {
+    background: #FAF5FF;
+    border-color: rgba(167, 139, 250, 0.6);
+}
+.ast-node.logical .lbl {
+    color: #7E22CE;
+}
+.ast-node.compare {
+    background: #EFF6FF;
+    border-color: rgba(79, 124, 255, 0.6);
+}
+.ast-node.compare .lbl {
+    color: #1D4ED8;
+    font-size: 0.92rem;
+}
+.ast-node.variable {
+    background: #FFFBEB;
+    border-color: rgba(251, 191, 36, 0.6);
+}
+.ast-node.variable .lbl {
+    color: #B45309;
+}
+.ast-node.literal {
+    background: #F0FDF4;
+    border-color: rgba(52, 211, 153, 0.6);
+}
+.ast-node.literal .lbl {
+    color: #15803D;
+}
+
+.samples-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+.sample-btn {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 5px 10px;
+    border-radius: var(--r-sm);
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.sample-btn:hover {
+    background: #FFFFFF;
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ================== SLIDER ================== */
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #E2E8F0;
+    border-radius: 3px;
+    outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    border: 2px solid #FFFFFF;
+    transition: transform 0.1s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+/* ================== TOAST ================== */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 10px 16px;
+    border-radius: var(--r-sm);
+    background: var(--text-primary);
+    color: #FFFFFF;
+    font-size: 0.8rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.25s var(--ease);
+    pointer-events: none;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ================== POLICY ANALYTICS METRIC GAUGES (VECTOR CRISP LIGHT) ================== */
+.metric-gauge-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-xs);
+}
+.metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.metric-label-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.metric-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+.metric-dot.compliant { background: var(--success); }
+.metric-dot.violated { background: var(--danger); }
+
+.metric-name {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+}
+.metric-val-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.metric-actual-pill {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.metric-status-badge {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: 3px;
+}
+.metric-status-badge.compliant {
+    color: var(--success-text);
+    background: var(--success-soft);
+    border: 1px solid var(--success-border);
+}
+.metric-status-badge.violated {
+    color: var(--danger-text);
+    background: var(--danger-soft);
+    border: 1px solid var(--danger-border);
+}
+.metric-track {
+    position: relative;
+    width: 100%;
+    height: 8px;
+    background: #E2E8F0;
+    border-radius: 4px;
+    overflow: visible;
+    margin: 12px 0 6px;
+}
+.metric-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.35s ease;
+}
+.metric-fill.compliant {
+    background: var(--success);
+}
+.metric-fill.violated {
+    background: var(--danger);
+}
+.metric-thresh-marker {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    background: #D97706;
+    z-index: 2;
+}
+.metric-thresh-label {
+    position: absolute;
+    top: -18px;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: #92400E;
+    background: #FFFBEB;
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid #FDE68A;
+    white-space: nowrap;
+}
+.metric-scales {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+}
+
+/* ================== RECENT EVALUATIONS TELEMETRY ================== */
+.eval-telemetry-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+.eval-bars-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 116px;
+    padding: 10px 10px 8px;
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    position: relative;
+    gap: 6px;
+}
+.eval-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+    position: relative;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+.eval-bar-col:hover { opacity: 0.8; }
+.eval-bar-pill {
+    width: 100%;
+    max-width: 22px;
+    border-radius: 4px 4px 1px 1px;
+    transition: height 0.3s ease;
+}
+.eval-bar-pill.pass {
+    background: var(--success);
+}
+.eval-bar-pill.fail {
+    background: var(--danger);
+}
+.eval-bar-tag {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.eval-bar-tag.pass { color: var(--success); }
+.eval-bar-tag.fail { color: var(--danger); }
+.eval-bar-seq {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--text-tertiary);
+    margin-top: 5px;
+}
+.eval-audit-mini-list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.eval-audit-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    font-size: 0.74rem;
+}
+.eval-audit-row .time {
+    font-family: var(--font-mono);
+    color: var(--text-tertiary);
+    font-size: 0.68rem;
+}
+.eval-audit-badge {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+.eval-audit-badge.pass {
+    color: var(--success-text);
+    background: var(--success-soft);
+    border: 1px solid var(--success-border);
+}
+.eval-audit-badge.fail {
+    color: var(--danger-text);
+    background: var(--danger-soft);
+    border: 1px solid var(--danger-border);
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 1080px) {
+    .grid { grid-template-columns: repeat(6, 1fr); }
+    .col-3 { grid-column: span 3; }
+    .col-4 { grid-column: span 6; }
+    .col-6 { grid-column: span 6; }
+    .col-7, .col-8 { grid-column: span 6; }
+    .mem-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ================== SEARCH BAR & TOPBAR CONTROLS (FIGMA ENTERPRISE SAAS) ================== */
+.topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: 230px;
+    height: 34px;
+    padding: 0 10px;
+    background: #FFFFFF;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-sm);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    transition: all 0.15s ease;
+    position: relative;
+    box-sizing: border-box;
+}
+.search:hover {
+    border-color: #94A3B8;
+}
+.search:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+.search svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--text-tertiary);
+    stroke-width: 2;
+    flex-shrink: 0;
+}
+.search input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-family: var(--font-body);
+    line-height: 1;
+}
+.search input::placeholder {
+    color: var(--text-disabled);
+    font-size: 0.8rem;
+}
+.search kbd {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    padding: 2px 5px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-4);
+    line-height: 1;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--r-sm);
+    background: #FFFFFF;
+    border: 1px solid var(--border-strong);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.12s ease;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    flex-shrink: 0;
+}
+.icon-btn:hover {
+    background: var(--bg-0);
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+.icon-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    flex-shrink: 0;
+}
+.icon-btn .indicator,
+.icon-btn .notify-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    min-width: 0 !important;
+    max-width: 8px !important;
+    min-height: 0 !important;
+    max-height: 8px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+    background: #EF4444 !important;
+    border: 1.5px solid #FFFFFF !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    pointer-events: none;
+    z-index: 2;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* ================== GLOBAL SVG ICONS SIZING SAFETY ================== */
+svg {
+    display: inline-block;
+    vertical-align: middle;
+    width: 15px;
+    height: 15px;
+    max-width: 100%;
+    stroke-width: 1.8;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.brand-mark svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2.2;
+}
+
+.nav-item svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--text-tertiary);
+    stroke-width: 1.8;
+    flex-shrink: 0;
+}
+.nav-item:hover svg {
+    stroke: var(--text-primary);
+}
+.nav-item.active svg {
+    stroke: var(--accent);
+}
+
+.stat-label svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--text-tertiary);
+    stroke-width: 1.8;
+    flex-shrink: 0;
+}
+
+.card-title svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--accent);
+    stroke-width: 1.8;
+    flex-shrink: 0;
+}
+
+.cmd-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    flex-shrink: 0;
+}
+
+.btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    flex-shrink: 0;
+}
+
+.chip svg {
+    width: 13px;
+    height: 13px;
+    stroke: currentColor;
+    stroke-width: 2;
+    flex-shrink: 0;
+}
+
+.chain-node svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--text-tertiary);
+    stroke-width: 1.8;
+    flex-shrink: 0;
+}
+
+
+
+/* ================== LOGOUT BUTTON & COMPANY LOGO ================== */
+.company-logo {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    border-radius: 8px;
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+}
+.company-logo:hover {
+    transform: scale(1.05);
+}
+
+.logout-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 6px;
+    background: #FEF2F2;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+.logout-btn:hover {
+    background: #DC2626;
+    color: #FFFFFF;
+    border-color: #DC2626;
+}
+.logout-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2;
+    flex-shrink: 0;
+}
+
+</style>
+
+</head>
+
+<body>
+    <div class="app">
+
+
+
+    <!-- ============ SIDEBAR ============ -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <img src="smart_city.png" alt="SmartCity360" class="company-logo" />
+
+            <div class="brand-text">Smart<span>City360</span></div>
+
+        </div>
+
+
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-section">Operations</div>
+
+            <div class="nav-item active" data-view="overview" onclick="switchView('overview')">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                    <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+
+                    <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+
+                </svg>
+
+                Overview
+
+            </div>
+
+            <div class="nav-item" data-view="complaints" onclick="switchView('complaints')">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+
+                </svg>
+
+                Complaints
+
+                <span class="nav-count alert" id="navComplaintsBadge" style="display:none;">0</span>
+
+            </div>
+
+            <div class="nav-item" data-view="zones" onclick="switchView('zones')">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                    <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/>
+
+                    <path d="M6 12H4a2 2 0 0 0-2 2v8h4"/><path d="M18 9h2a2 2 0 0 1 2 2v11h-4"/>
+
+                </svg>
+
+                City Zones
+
+            </div>
+
+
+
+            <div class="nav-section">Infrastructure</div>
+
+            <div class="nav-item" data-view="energy" onclick="switchView('energy')">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+
+                </svg>
+
+                Energy Grid
+
+            </div>
+
+            <div class="nav-item" data-view="lighting" onclick="switchView('lighting')">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                    <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+
+                    <path d="M9 18h6"/><path d="M10 22h4"/>
+
+                </svg>
+
+                Street Lighting
+
+            </div>
+
+
+
+            <div class="nav-section">Configuration</div>
+
+            <div class="nav-item" data-view="policy" onclick="switchView('policy')">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                    <path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/>
+
+                    <path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/>
+
+                </svg>
+
+                Policy Rules
+
+            </div>
+
+        </nav>
+
+
+
+        <div class="sidebar-footer">
+
+            <div class="user-card" title="Enterprise SCADA Console">
+                <div class="user-avatar" style="background:var(--accent); font-weight:700;">DB</div>
+                <div class="user-meta">
+                    <div class="user-name">Dinil Bositha</div>
+                    <div class="user-role" style="font-family:var(--font-mono); font-size:0.68rem; color:var(--accent);">Operations Lead</div>
+                </div>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- ============ MAIN ============ -->
+
+    <main class="main">
+
+
+
+        <!-- Topbar -->
+
+        <header class="topbar">
+
+            <div class="topbar-title" id="pageTitle">Overview</div>
+
+            <div class="topbar-divider"></div>
+
+            <div class="topbar-subtitle">Metro City · Live <span id="clock" style="margin-left: 8px; font-family: var(--font-mono); color: var(--text-tertiary);"></span></div>
+
+
+
+            <div class="topbar-right">
+
+                <div style="display:flex; align-items:center; gap:8px; padding:4px 10px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); font-size:0.75rem; margin-right:8px;">
+                    <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--success); box-shadow:0 0 0 2px rgba(5,150,105,0.2);"></span>
+                    <span style="font-weight:600; color:var(--text-primary);">Metro SCADA Grid</span>
+                    <span style="color:var(--border-strong);">&bull;</span>
+                    <span style="font-family:var(--font-mono); color:var(--accent);">Online &middot; Zone A-01</span>
+                </div>
+
+                <div class="search">
+
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+
+                    </svg>
+
+                    <input type="text" id="topbarSearchInput" placeholder="Search operations, tickets, zones..." />
+
+                    <kbd>⌘K</kbd>
+
+                </div>
+
+                <button class="btn btn-ghost">
+
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+
+                        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+
+                    </svg>
+
+                    Export
+
+                </button>
+
+                <button class="icon-btn" aria-label="Notifications" title="Notifications">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                    <span class="notify-badge"></span>
+                </button>
+
+            <a href="login.html" class="logout-btn" title="Sign Out of Portal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            <span>Log Out</span>
+        </a>
+            </div>
+
+        </header>
+
+
+
+        <!-- Content -->
+
+        <div class="content">
+
+
+
+            <!-- ============ OVERVIEW ============ -->
+
+            <div class="view active" id="view-overview">
+
+                <div class="page-intro" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <h2>City Operations Overview</h2>
+                        <p>Real-time municipal SCADA console demonstrating 5 Gang of Four (GoF) structural and behavioral design patterns.</p>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="display:inline-flex; align-items:center; gap:6px; font-size:0.72rem; color:var(--text-secondary); background:var(--bg-2); border:1px solid var(--border); padding:6px 12px; border-radius:var(--r-sm);">
+                            <span class="status-dot success pulse" id="overviewSyncDot"></span>
+                            <span style="font-weight:600; color:var(--text-primary);">Live SCADA Stream</span>
+                            <span style="color:var(--border-strong);">&bull;</span>
+                            <span id="overviewSyncStatus" style="font-family:var(--font-mono); color:var(--accent);">Auto-Sync (3.5s)</span>
+                            <button type="button" class="sample-btn" style="margin:0 0 0 4px; padding:2px 8px; font-size:0.68rem; background:var(--accent-soft); color:var(--accent); border-color:var(--accent);" onclick="refreshOverviewData(true)">Sync Now</button>
+                        </div>
+                        <div style="text-align:right; font-size:0.75rem; color:var(--text-secondary); background:var(--bg-2); border:1px solid var(--border); padding:8px 14px; border-radius:var(--r-sm);">
+                            <div style="font-weight:600; color:var(--text-primary);">Metro Municipal Operations Center</div>
+                            <div style="font-family:var(--font-mono); color:var(--accent); font-size:0.7rem; margin-top:2px;">SCADA Core Engine &middot; Release 2026.4</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="grid">
+
+
+
+                    <!-- Energy Load (hero stat) -->
+                    <div class="card col-4">
+                        <div class="stat-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                            </svg>
+                            Total Energy Grid Load
+                        </div>
+                        <div class="stat-value" id="kpiEnergyTotal">2,847 <span class="unit">kW</span></div>
+                        <div class="stat-trend" id="kpiEnergyTrend">
+                            <span class="status-dot success" id="kpiEnergyDot"></span>
+                            <span id="kpiEnergyStatusText">Grid Online &middot; Normal Distribution</span>
+                        </div>
+
+                        <div class="stat-divider"></div>
+
+                        <div class="data-row">
+                            <span class="label"><span class="status-dot success" id="kpiNorthDot"></span>North District</span>
+                            <span class="value" id="kpiNorthUsage">1,247 kW</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="label"><span class="status-dot success" id="kpiSouthDot"></span>South District</span>
+                            <span class="value" id="kpiSouthUsage">1,600 kW</span>
+                        </div>
+                    </div>
+
+                    <!-- Open Complaints -->
+                    <div class="card col-4">
+                        <div class="stat-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            Citizen Complaints (MySQL)
+                        </div>
+                        <div class="stat-value" id="kpiComplaints">0 <span class="unit">pending</span></div>
+                        <div class="stat-trend" id="kpiComplaintTrend">
+                            <span class="status-dot info pulse"></span> Live from MySQL complaints table
+                        </div>
+
+                        <div class="stat-divider"></div>
+
+                        <div class="data-row">
+                            <span class="label">Handled / Resolved</span>
+                            <span class="value success" id="kpiComplaintsResolved">0</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="label">Total Ingested</span>
+                            <span class="value" id="kpiComplaintsTotal">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Status summary -->
+                    <div class="card col-4">
+                        <div class="stat-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            System Health
+                        </div>
+                        <div class="stat-value" id="kpiHealthVal" style="color: var(--success);">99.98<span class="unit">%</span></div>
+                        <div class="stat-trend" id="kpiHealthStatus">
+                            <span class="status-dot success"></span> All 5 GoF engines active
+                        </div>
+
+                        <div class="stat-divider"></div>
+
+                        <div class="data-row">
+                            <span class="label">Telemetry Pipeline Latency</span>
+                            <span class="value" id="kpiTelemetryLatency">1.8 ms</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="label">Policy Evaluations Logged</span>
+                            <span class="value success" id="kpiPolicyEvalsCount">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Activity feed (wide) -->
+
+                    <div class="card col-7">
+
+                        <div class="card-head">
+
+                            <div class="card-title">Live Activity</div>
+
+                            <div class="card-meta">LAST 30 MIN</div>
+
+                        </div>
+
+                        <div class="activity" id="activityFeed"></div>
+
+                    </div>
+
+
+
+                    <!-- Quick access -->
+
+                    <div class="card col-5">
+
+                        <div class="card-head">
+
+                            <div class="card-title">Quick Access</div>
+
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+
+                            <button class="btn btn-ghost" onclick="switchView('complaints')" style="width: 100%; justify-content: flex-start;">
+
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+
+                                </svg>
+
+                                View Complaints
+
+                            </button>
+
+                            <button class="btn btn-ghost" onclick="switchView('zones')" style="width: 100%; justify-content: flex-start;">
+
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                                    <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/>
+
+                                    <path d="M6 12H4a2 2 0 0 0-2 2v8h4"/><path d="M18 9h2a2 2 0 0 1 2 2v11h-4"/>
+
+                                </svg>
+
+                                Manage Zones
+
+                            </button>
+
+                            <button class="btn btn-ghost" onclick="switchView('lighting')" style="width: 100%; justify-content: flex-start;">
+
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                                    <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+
+                                    <path d="M9 18h6"/><path d="M10 22h4"/>
+
+                                </svg>
+
+                                Streetlight Fleet
+
+                            </button>
+
+                            <button class="btn btn-ghost" onclick="switchView('policy')" style="width: 100%; justify-content: flex-start;">
+
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                                    <path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/>
+
+                                </svg>
+
+                                Policy Rules
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Streetlights stat -->
+                    <div class="card col-3">
+                        <div class="stat-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+                                <path d="M9 18h6"/><path d="M10 22h4"/>
+                            </svg>
+                            Streetlights
+                        </div>
+                        <div class="stat-value" id="kpiStreetlightsTotal">50,000</div>
+                        <div class="stat-trend up" id="kpiStreetlightsTrend"><span class="arrow">&uarr;</span> Shared Flyweight Pool</div>
+                    </div>
+
+                    <!-- Zones stat -->
+                    <div class="card col-3">
+                        <div class="stat-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/>
+                            </svg>
+                            Active Zones
+                        </div>
+                        <div class="stat-value" id="kpiActiveZonesTotal">10</div>
+                        <div class="stat-trend" id="kpiActiveZonesTrend"><span class="status-dot success"></span> All reporting</div>
+                    </div>
+
+                    <!-- Buildings stat -->
+                    <div class="card col-3">
+                        <div class="stat-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                            </svg>
+                            Buildings
+                        </div>
+                        <div class="stat-value" id="kpiActiveBuildingsTotal">10</div>
+                        <div class="stat-trend" id="kpiActiveBuildingsTrend">Across 4 streets</div>
+                    </div>
+
+                    <!-- Connected districts -->
+                    <div class="card col-3">
+                        <div class="stat-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            Policy AST Latency
+                        </div>
+                        <div class="stat-value" id="kpiAvgPolicyLatency">14<span class="unit">&mu;s</span></div>
+                        <div class="stat-trend up" id="kpiPolicyLatencyTrend"><span class="arrow">&darr;</span> High-Throughput Engine</div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!-- ============ COMPLAINTS ============ -->
+
+            <div class="view" id="view-complaints">
+
+                <div class="page-intro">
+
+                    <div>
+
+                        <h2>Citizen Complaints</h2>
+
+                        <p>Live stream from the citizen portal — auto-routed through the escalation chain by severity.</p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="grid">
+
+                    <div class="card col-8">
+
+                        <div class="card-head">
+
+                            <div class="card-title">Incoming Complaints</div>
+
+                            <div class="card-meta" id="complaintsCount">0 total</div>
+
+                        </div>
+
+                        <div class="complaints" id="adminComplaintsList"></div>
+
+                    </div>
+
+
+
+                    <div class="card col-4">
+
+                        <div class="card-head">
+
+                            <div class="card-title">Escalation Chain</div>
+
+                        </div>
+
+                        <div class="chain" id="chainView">
+
+                            <div class="chain-node" data-h="Local Staff">
+
+                                <span class="chain-name">Local Staff</span>
+
+                                <span class="chain-range">sev 1–3</span>
+
+                            </div>
+
+                            <div class="chain-node" data-h="Supervisor">
+
+                                <span class="chain-name">Supervisor</span>
+
+                                <span class="chain-range">sev 4–6</span>
+
+                            </div>
+
+                            <div class="chain-node" data-h="City Manager">
+
+                                <span class="chain-name">City Manager</span>
+
+                                <span class="chain-range">sev 7–8</span>
+
+                            </div>
+
+                            <div class="chain-node" data-h="Emergency Director">
+
+                                <span class="chain-name">Emergency Director</span>
+
+                                <span class="chain-range">sev 9–10</span>
+
+                            </div>
+
+                        </div>
+
+                        <div style="margin-top: 16px; padding: 12px 14px; background: var(--bg-1); border: 1px dashed var(--border); border-radius: var(--r-sm); font-size: 0.72rem; color: var(--text-tertiary); line-height: 1.6;">
+
+                            Complaints route automatically based on severity. Higher severity escalates further up the chain.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ============ ZONES ============ -->
+
+            <div class="view" id="view-zones">
+
+                <div class="page-intro">
+
+                    <div>
+
+                        <h2>City Zones</h2>
+
+                        <p>Broadcast operational commands to any level of the hierarchy — city, district, street, or building.</p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="grid">
+
+                    <div class="card col-7">
+
+                        <div class="card-head">
+
+                            <div class="card-title">Hierarchy</div>
+
+                            <div class="card-meta">CLICK TO SELECT</div>
+
+                        </div>
+
+                        <div class="tree-container">
+
+                            <ul class="tree" id="zoneTree"></ul>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="card col-5">
+
+                        <div class="card-head">
+
+                            <div class="card-title">Commands</div>
+
+                        </div>
+
+                        <div id="zoneSelection" style="padding: 12px 14px; background: var(--bg-1); border: 1px dashed var(--border); border-radius: var(--r-sm); font-size: 0.76rem; color: var(--text-tertiary); margin-bottom: 12px;">
+
+                            Select a zone or building to issue a command.
+
+                        </div>
+
+                        <div class="cmd-grid">
+
+                            <button class="cmd-btn" data-cmd="shutdown" disabled onclick="runZoneCmd(this.dataset.cmd)">
+
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                                    <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>
+
+                                </svg>
+
+                                Shutdown
+
+                            </button>
+
+                            <button class="cmd-btn" data-cmd="report" disabled onclick="runZoneCmd(this.dataset.cmd)">
+
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+
+                                    <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/>
+
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+
+                                </svg>
+
+                                Report
+
+                            </button>
+
+                            <button class="cmd-btn" data-cmd="emergency" disabled onclick="runZoneCmd(this.dataset.cmd)">
+
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+
+                                    <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+
+                                </svg>
+
+                                Emergency
+
+                            </button>
+
+                            <button class="cmd-btn" data-cmd="restore" disabled onclick="runZoneCmd(this.dataset.cmd)">
+
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                                    <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+
+                                </svg>
+
+                                Restore
+
+                            </button>
+
+                        </div>
+
+                        <div class="trace" id="zoneTrace"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ============ ENERGY ============ -->
+
+            <div class="view" id="view-energy">
+
+                <div class="page-intro">
+
+                    <div>
+
+                        <h2>Energy Grid</h2>
+
+                        <p>Secure meter streams with layered decorators — encryption, authentication, compression.</p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="grid">
+
+                    <div class="card col-7">
+
+                        <div class="card-head">
+
+                            <div class="card-title">Process Meter</div>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="form-label">Meter Reading</label>
+
+                            <textarea class="form-textarea" id="meterData">METER-0142|kWh=12873.44|VOLT=230.1|AMP=12.7|TS=2025-06-11T09:42:00Z</textarea>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="form-label">Security Layers</label>
+
+                            <div class="chips" id="securityChips">
+
+                                <div class="chip active" data-layer="encryption" onclick="toggleChip(this)">
+
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                                        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+
+                                    </svg>
+
+                                    Encrypt
+
+                                </div>
+
+                                <div class="chip active" data-layer="authentication" onclick="toggleChip(this)">
+
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+
+                                    </svg>
+
+                                    Auth
+
+                                </div>
+
+                                <div class="chip active" data-layer="compression" onclick="toggleChip(this)">
+
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+                                        <polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/>
+
+                                        <line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/>
+
+                                    </svg>
+
+                                    Compress
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="processMeter()">
+
+                            Process Stream
+
+                        </button>
+
+                        <div id="meterResult" class="result-box" style="display: none;"></div>
+
+                    </div>
+
+
+
+                    <div class="card col-5">
+
+                        <div class="card-head">
+
+                            <div class="card-title">Pipeline</div>
+
+                        </div>
+
+                        <div class="flow" id="flowView">
+
+                            <div class="flow-step" data-flow="base">
+
+                                <div class="flow-num">1</div>
+
+                                <div>BaseDataStream — raw meter</div>
+
+                            </div>
+
+                            <div class="flow-step" data-flow="encryption">
+
+                                <div class="flow-num">2</div>
+
+                                <div>EncryptionDecorator — XOR + Base64</div>
+
+                            </div>
+
+                            <div class="flow-step" data-flow="authentication">
+
+                                <div class="flow-num">3</div>
+
+                                <div>AuthenticationDecorator — hash token</div>
+
+                            </div>
+
+                            <div class="flow-step" data-flow="compression">
+
+                                <div class="flow-num">4</div>
+
+                                <div>CompressionDecorator — run-length</div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ============ LIGHTING ============ -->
+
+            <div class="view" id="view-lighting">
+
+                <div class="page-intro">
+
+                    <div>
+
+                        <h2>Street Lighting</h2>
+
+                        <p>Fleet-wide memory usage — shared intrinsic state keeps 50,000 lights lean.</p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="grid">
+
+                    <div class="card col-12">
+
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px;">
+
+                            <div class="card-title">Fleet Size</div>
+
+                            <div style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; color: var(--accent); letter-spacing: -0.03em;" id="lightCount">10,000</div>
+
+                        </div>
+
+                        <input type="range" id="lightSlider" min="100" max="50000" step="100" value="10000" oninput="updateLighting()">
+
+
+
+                        <div class="mem-grid">
+
+                            <div class="mem-card">
+
+                                <div class="mem-title"><span class="status-dot danger"></span> Without Shared State</div>
+
+                                <div class="mem-bar"><div class="mem-fill" id="memFillWithout"></div></div>
+
+                                <div class="mem-value" id="memWithout">2.40 MB</div>
+
+                                <div class="mem-sub" id="memSubWithout"></div>
+
+                            </div>
+
+                            <div class="mem-card with">
+
+                                <div class="mem-title"><span class="status-dot success"></span> With Shared State</div>
+
+                                <div class="mem-bar"><div class="mem-fill" id="memFillWith"></div></div>
+
+                                <div class="mem-value" id="memWith">0.84 MB</div>
+
+                                <div class="mem-sub" id="memSubWith"></div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="savings">
+
+                            <div>
+
+                                <div class="savings-label">Memory Saved</div>
+
+                                <div class="savings-value" id="savingsValue">71%</div>
+
+                            </div>
+
+                            <div style="font-size: 0.76rem; color: var(--text-tertiary); max-width: 440px; line-height: 1.65;">
+
+                                Firmware, colour temperature and wattage are shared across all lights. Only ID, GPS coordinates and on/off state are stored per instance.
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ============ POLICY ============ -->
+
+            <div class="view" id="view-policy">
+
+                <div class="page-intro">
+
+                    <div>
+
+                        <h2>Policy Rules</h2>
+
+                        <p>Define city policy rules in a mini-language and evaluate against live context.</p>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="grid">
+
+                    <div class="card col-6">
+
+                        <div class="card-head">
+
+                            <div class="card-title">Rule Definition</div>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="form-label">Policy Rule</label>
+
+                            <textarea class="form-textarea" id="dslInput">(noise > 55 AND zone = "residential") OR (noise > 70 AND zone = "commercial")</textarea>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="form-label">Example Rules</label>
+
+                            <div class="samples-list">
+                                <button type="button" class="sample-btn" onclick="loadRule('noise <= 55')">Noise &le; 55 dB (Residential Limit)</button>
+                                <button type="button" class="sample-btn" onclick="loadRule('hour >= 8 AND hour <= 18')">Parking hours 8:00&ndash;18:00</button>
+                                <button type="button" class="sample-btn" onclick="loadRule('NOT (hour >= 22 AND zone = &quot;residential&quot;)')">Night curfew restriction</button>
+                                <button type="button" class="sample-btn" onclick="loadRule('emission_alert')">Air Quality PM2.5 (Industrial Zone)</button>
+                                <button type="button" class="sample-btn" onclick="loadRule('hvac_peak')">Peak Grid &amp; Temperature Control</button>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="form-label">Context (JSON)</label>
+
+                            <textarea class="form-textarea" id="ctxInput">{
+
+    "noise": 62,
+
+    "hour": 14,
+
+    "zone": "residential"
+
+}</textarea>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="card col-6">
+
+                        <div class="card-head">
+
+                            <div class="card-title">Expression Syntax Tree (AST)</div>
+                            <div style="display:flex; gap:4px; align-items:center;">
+                                <button type="button" class="sample-btn" id="btnAstVisual" style="margin:0; padding:2px 8px; font-size:0.68rem; background:var(--accent-soft); color:var(--accent); border-color:var(--accent);" onclick="setAstViewMode('visual')">Visual Tree</button>
+                                <button type="button" class="sample-btn" id="btnAstOutline" style="margin:0; padding:2px 8px; font-size:0.68rem;" onclick="setAstViewMode('outline')">Outline</button>
+                                <button type="button" class="sample-btn" id="btnAstJson" style="margin:0; padding:2px 8px; font-size:0.68rem;" onclick="setAstViewMode('json')">JSON</button>
+                            </div>
+
+                        </div>
+
+                        <div class="ast-container" id="astContainer">
+
+                            <div class="ast-empty">Enter a rule to build the tree.</div>
+
+                        </div>
+
+                        <div id="policyResult"></div>
+                    </div>
+
+                    <!-- Policy Analytics & Interactive Charts (Interpreter Pattern) -->
+                    <div class="card col-12" style="margin-top: 14px;">
+                        <div class="card-head" style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div class="card-title">Policy Evaluation & Constraint Analytics</div>
+                                <div style="font-size:0.75rem; color:var(--text-tertiary); margin-top:2px;">Visual comparison of sensor metrics against rule constraints and execution audit log.</div>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                <button class="sample-btn" style="margin:0; padding:5px 12px; background:var(--accent-soft); color:var(--accent); border:1px solid var(--accent);" onclick="openNewPolicyModal()">+ New Policy Rule</button>
+                                <button class="sample-btn" style="margin:0; padding:5px 12px;" onclick="fetchDbPolicies()">Refresh Database</button>
+                            </div>
+                        </div>
+
+                        <!-- KPI Summary Row -->
+                        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-bottom:16px;">
+                            <div style="background:var(--bg-1); border:1px solid var(--border-subtle); border-radius:var(--r-sm); padding:10px 14px;">
+                                <div style="font-size:0.68rem; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">Evaluations Logged</div>
+                                <div id="statTotalEvals" style="font-family:var(--font-display); font-size:1.35rem; font-weight:700; color:var(--text-primary); margin-top:2px;">0</div>
+                            </div>
+                            <div style="background:var(--bg-1); border:1px solid var(--border-subtle); border-radius:var(--r-sm); padding:10px 14px;">
+                                <div style="font-size:0.68rem; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">Compliance Rate</div>
+                                <div id="statPassRate" style="font-family:var(--font-display); font-size:1.35rem; font-weight:700; color:var(--success); margin-top:2px;">100%</div>
+                            </div>
+                            <div style="background:var(--bg-1); border:1px solid var(--border-subtle); border-radius:var(--r-sm); padding:10px 14px;">
+                                <div style="font-size:0.68rem; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">AST Parse Latency</div>
+                                <div id="statAvgLatency" style="font-family:var(--font-mono); font-size:1.35rem; font-weight:600; color:var(--accent); margin-top:2px;">0 µs</div>
+                            </div>
+                            <div style="background:var(--bg-1); border:1px solid var(--border-subtle); border-radius:var(--r-sm); padding:10px 14px;">
+                                <div style="font-size:0.68rem; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">Active Rules (MySQL)</div>
+                                <div id="statActiveRules" style="font-family:var(--font-display); font-size:1.35rem; font-weight:700; color:var(--text-primary); margin-top:2px;">3</div>
+                            </div>
+                        </div>
+
+                        <!-- Split Chart Area: Sensor Constraints & Recent History -->
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                            <div style="background:var(--bg-1); border:1px solid var(--border-subtle); border-radius:var(--r-sm); padding:14px; display:flex; flex-direction:column;">
+                                <div style="font-size:0.78rem; font-weight:600; color:var(--text-secondary); margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                                    <div style="display:flex; align-items:center; gap:6px;">
+                                        <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent);"></span>
+                                        <span>Sensor Metrics vs Policy Thresholds</span>
+                                    </div>
+                                    <span style="font-size:0.68rem; color:var(--text-tertiary); font-family:var(--font-mono);">Live Telemetry Comparison</span>
+                                </div>
+                                <div id="policyConstraintContainer" style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:8px;"></div>
+                            </div>
+
+                            <div style="background:var(--bg-1); border:1px solid var(--border-subtle); border-radius:var(--r-sm); padding:14px; display:flex; flex-direction:column;">
+                                <div style="font-size:0.78rem; font-weight:600; color:var(--text-secondary); margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                                    <div style="display:flex; align-items:center; gap:6px;">
+                                        <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--success);"></span>
+                                        <span>Recent Evaluations Stream (MySQL Audit Log)</span>
+                                    </div>
+                                    <span style="font-size:0.68rem; color:var(--text-tertiary); font-family:var(--font-mono);">Real-Time Audit Trail</span>
+                                </div>
+                                <div id="policyHistoryContainer" style="flex:1; display:flex; flex-direction:column; justify-content:space-between;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Saved Policies Table (Database CRUD Management) -->
+                        <div style="margin-top:16px;">
+                            <div style="font-size:0.8rem; font-weight:600; color:var(--text-primary); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                                <span>Active Policies in MySQL Database</span>
+                                <span style="font-size:0.72rem; color:var(--text-tertiary);">Table: policies · Direct CRUD Persistence</span>
+                            </div>
+                            <div style="overflow-x:auto;">
+                                <table style="width:100%; border-collapse:collapse; font-size:0.78rem; text-align:left;">
+                                    <thead>
+                                        <tr style="border-bottom:1px solid var(--border-subtle); color:var(--text-tertiary);">
+                                            <th style="padding:8px 10px; font-weight:500;">Code</th>
+                                            <th style="padding:8px 10px; font-weight:500;">Policy Name</th>
+                                            <th style="padding:8px 10px; font-weight:500;">Category</th>
+                                            <th style="padding:8px 10px; font-weight:500;">DSL Grammar Rule</th>
+                                            <th style="padding:8px 10px; font-weight:500;">Status</th>
+                                            <th style="padding:8px 10px; font-weight:500; text-align:right;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dbPolicyTableBody">
+                                        <!-- Dynamically loaded from /api/patterns/interpreter -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: New Policy Rule -->
+            <div id="policyModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.45); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center;">
+                <div style="background:var(--bg-2); border:1px solid var(--border-strong); border-radius:var(--r); width:90%; max-width:520px; padding:20px; box-shadow:0 20px 40px rgba(0,0,0,0.5);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                        <h3 id="policyModalTitle" style="font-size:0.95rem; font-weight:600; color:var(--text-primary);">Create New City Policy Rule</h3>
+                        <button onclick="closePolicyModal()" style="color:var(--text-tertiary); font-size:1.2rem; cursor:pointer; background:none; border:none;">&times;</button>
+                    </div>
+                    <div class="form-group" style="margin-bottom:10px;">
+                        <label class="form-label">Policy Name</label>
+                        <input type="text" class="form-input" id="modalPolicyName" placeholder="e.g., Heavy Traffic Air Quality Rule" style="width:100%; background:var(--bg-3); border:1px solid var(--border); padding:8px 10px; border-radius:var(--r-sm); color:var(--text-primary); font-size:0.82rem;">
+                    </div>
+                    <div class="form-group" style="margin-bottom:10px;">
+                        <label class="form-label">Category</label>
+                        <select id="modalPolicyCategory" style="width:100%; background:var(--bg-3); border:1px solid var(--border); padding:8px 10px; border-radius:var(--r-sm); color:var(--text-primary); font-size:0.82rem;">
+                            <option value="Environmental">Environmental</option>
+                            <option value="Traffic">Traffic & Parking</option>
+                            <option value="Safety">Safety & Curfew</option>
+                            <option value="Energy">Energy Grid</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:10px;">
+                        <label class="form-label">DSL Rule Expression</label>
+                        <textarea class="form-textarea" id="modalPolicyDsl" placeholder="e.g., pm25 > 40 AND (zone == 'industrial' OR hour >= 16)" style="height:70px;"></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom:14px;">
+                        <label class="form-label">Description</label>
+                        <input type="text" class="form-input" id="modalPolicyDesc" placeholder="Brief rationale for this rule" style="width:100%; background:var(--bg-3); border:1px solid var(--border); padding:8px 10px; border-radius:var(--r-sm); color:var(--text-primary); font-size:0.82rem;">
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; gap:8px;">
+                        <button onclick="closePolicyModal()" class="sample-btn" style="margin:0;">Cancel</button>
+                        <button onclick="savePolicyModal()" class="btn-primary" style="background:var(--accent); color:#fff; padding:7px 16px; border-radius:var(--r-sm); font-size:0.82rem; font-weight:500; cursor:pointer;">Save to MySQL</button>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+
+<div class="toast" id="toast"></div>
+
+
+
+<script src="js/script.js?v=9.1"></script>
+
+
+
+<script>
+
+/* ===== Inline navigation + clock (works before js/script.js loads) ===== */
+
+function switchView(view) {
+    document.querySelectorAll('.nav-item[data-view]').forEach(n => n.classList.remove('active'));
+    const btn = document.querySelector(`.nav-item[data-view="${view}"]`);
+    if (btn) btn.classList.add('active');
+
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const viewEl = document.getElementById('view-' + view);
+    if (viewEl) viewEl.classList.add('active');
+
+    const titles = {
+        overview: 'Overview', complaints: 'Complaints', zones: 'City Zones',
+        energy: 'Energy Grid', lighting: 'Street Lighting', policy: 'Policy Rules'
+    };
+    const titleEl = document.getElementById('pageTitle') || document.getElementById('breadcrumb');
+    if (titleEl) titleEl.textContent = titles[view] || 'Overview';
+
+    if (view === 'complaints' && typeof renderComplaints === 'function') renderComplaints();
+    if (view === 'overview' && typeof renderOverview === 'function') renderOverview();
+    if (view === 'lighting' && typeof updateLighting === 'function') updateLighting();
+    if (view === 'zones' && typeof buildZones === 'function') buildZones();
+}
+
+</script>
+
+
+
+</body>
+
+</html>

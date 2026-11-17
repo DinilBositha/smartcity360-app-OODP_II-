@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartCity360 — City Manager Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/portal-theme.css">
+    <style>
+        :root {
+            --role-accent: #8b5cf6;
+            --role-glow: rgba(139, 92, 246, 0.18);
+            --role-gradient: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <a href="manager.html" class="brand">
+            <img src="smart_city.png" alt="SmartCity360" class="company-logo" />
+            <div class="brand-name">SmartCity<span>360</span> &middot; City Executive Manager</div>
+        </a>
+
+        <div class="header-right">
+            <div class="user-info">
+                <div class="user-name">City Executive Manager</div>
+                <div class="user-role">Municipal Executive &middot; Level 3</div>
+            </div>
+            <a href="login.html" class="logout-btn" title="Sign Out of Portal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            <span>Log Out</span>
+        </a>
+            <div class="avatar">CM</div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main">
+        <!-- HERO BANNER -->
+        <div class="hero-banner">
+            <div>
+                <h1 class="hero-title">Executive Action Queue (Severity 7–8)</h1>
+                <p class="hero-desc">High-severity civic disruptions, major infrastructure repairs, and supervisor escalations. Authorize solutions or invoke Crisis Management.</p>
+            </div>
+        </div>
+
+        <!-- CHAIN OF RESPONSIBILITY VISUALIZER -->
+        <div class="chain-bar">
+            <div class="chain-step">
+                <div class="step-dot"></div>
+                <span>1. Local Staff</span>
+            </div>
+            <div class="chain-arrow">&rarr;</div>
+            <div class="chain-step">
+                <div class="step-dot"></div>
+                <span>2. Supervisor</span>
+            </div>
+            <div class="chain-arrow">&rarr;</div>
+            <div class="chain-step current">
+                <div class="step-dot"></div>
+                <span>3. City Manager (You)</span>
+            </div>
+            <div class="chain-arrow">&rarr;</div>
+            <div class="chain-step">
+                <div class="step-dot"></div>
+                <span>4. Emergency Director</span>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-val" id="statActive">0</div>
+                <div class="stat-label">Pending Executive Action</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="statHandled">0</div>
+                <div class="stat-label">Resolved by Manager</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="statTotal">0</div>
+                <div class="stat-label">Total Assigned</div>
+            </div>
+        </div>
+
+        <!-- QUEUE -->
+        <div class="section-header">
+            <div class="section-title">High Priority Queue</div>
+            <span style="font-size: 0.78rem; color: #64748b;">Live DB Sync &middot; 3s</span>
+        </div>
+
+        <div class="complaint-list" id="complaintQueue">
+            <!-- Rendered dynamically -->
+        </div>
+    </main>
+
+    <!-- ESCALATE MODAL -->
+    <div class="modal-overlay" id="escalateModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">⚡ Escalate to Emergency (<span id="escalateCode"></span>)</div>
+                <div class="modal-close" onclick="closeEscalateModal()">&times;</div>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 14px;">
+                    This complaint will be handed off to the <strong style="color: #ef4444;" id="escalateTargetName">Emergency Director</strong> for immediate crisis intervention.
+                </p>
+                <label for="escalateReason">Crisis Escalation Justification:</label>
+                <textarea id="escalateReason" placeholder="e.g. Critical danger to public safety or total grid collapse..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" style="background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0;" onclick="closeEscalateModal()">Cancel</button>
+                <button class="btn btn-escalate" onclick="confirmEscalation()">Authorize Crisis Escalation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        window.ROLE_CONFIG = {
+            handlerId: 3,
+            roleName: 'City Manager',
+            nextRole: 'Emergency Director',
+            severityRange: '7–8'
+        };
+    </script>
+    <script src="js/role-portal.js"></script>
+</body>
+</html>

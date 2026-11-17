@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartCity360 — Emergency Director Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/portal-theme.css">
+    <style>
+        :root {
+            --role-accent: #ef4444;
+            --role-glow: rgba(239, 68, 68, 0.2);
+            --role-gradient: linear-gradient(135deg, #ef4444, #b91c1c);
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <a href="director.html" class="brand">
+            <img src="smart_city.png" alt="SmartCity360" class="company-logo" />
+            <div class="brand-name">SmartCity<span>360</span> &middot; Emergency Crisis Director</div>
+        </a>
+
+        <div class="header-right">
+            <div class="user-info">
+                <div class="user-name">Emergency Response Director</div>
+                <div class="user-role">Crisis Command &middot; Level 4 (Terminal)</div>
+            </div>
+            <a href="login.html" class="logout-btn" title="Sign Out of Portal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            <span>Log Out</span>
+        </a>
+            <div class="avatar">ED</div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main">
+        <!-- HERO BANNER -->
+        <div class="hero-banner">
+            <div>
+                <h1 class="hero-title">Crisis Command Queue (Severity 9–10)</h1>
+                <p class="hero-desc">Highest authority in the Chain of Responsibility. Critical public hazards, major blackouts, and emergency interventions.</p>
+            </div>
+        </div>
+
+        
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-val" id="statActive">0</div>
+                <div class="stat-label">Active Emergencies</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="statHandled">0</div>
+                <div class="stat-label">Resolved Emergencies</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="statTotal">0</div>
+                <div class="stat-label">Total Escalated</div>
+            </div>
+        </div>
+
+        <!-- QUEUE -->
+        <div class="section-header">
+            <div class="section-title">Critical Incident Queue</div>
+            <span style="font-size: 0.78rem; color: #64748b;">Live DB Sync &middot; 3s</span>
+        </div>
+
+        <div class="complaint-list" id="complaintQueue">
+            <!-- Rendered dynamically -->
+        </div>
+    </main>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        window.ROLE_CONFIG = {
+            handlerId: 4,
+            roleName: 'Emergency Director',
+            nextRole: null, // Terminal handler
+            severityRange: '9–10'
+        };
+    </script>
+    <script src="js/role-portal.js"></script>
+</body>
+</html>
